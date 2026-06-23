@@ -1,0 +1,41 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ES2022",
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    "strict": true,
+
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": false,
+
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
