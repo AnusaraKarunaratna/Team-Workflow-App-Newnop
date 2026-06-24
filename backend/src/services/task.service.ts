@@ -9,21 +9,53 @@ export const createTask = async (data: any, userId: string) => {
     });
 }
 
-export const getTasks = async (user: any) => {
-    if(user.role === "ADMIN"){
-        return await Task.find()
-            //If the user is an admin, it executes Task.find(), which fetches all tasks in the database, regardless of who created them.
-            .populate("createdBy", "name email")
-            .populate("assignedTo","name email");
+export const getTasks = async (user: any, query: any) => {
+
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page-1) * limit;
+
+    const filter: any = {};
+
+    // RBAC
+    if (user.role !== "ADMIN") {
+        filter.$or = [
+            { createdBy: user.id },
+            { assignedTo: user.id} 
+        ];
     }
 
-    return await Task.find({
-        $or: [
-            { createdBy: user.id },
-            { assignedTo: user.id },
-        ],
-    }).populate("assignedTo", "name email");
-}
+    // Filters
+    if (query.status) filter.status = query.status;
+    if (query.priority) filter.priority = query.priority;
+
+    // search 
+    if (query.search) {
+        filter.title = {
+            $regex : query.search,
+            //"i" stands for Case-Insensitivity.
+            $options: "i",
+        };
+    }
+
+    const tasks = await Task.find(filter)
+        .populate("createdBy", "name email")
+        .populate("assignedTo", "name email")
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+
+    const total = await Task.countDocuments(filter);
+
+    return {
+        data: tasks,
+        pagination: {
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+        },
+    };
+};
 
 export const getTaskById = async (id: string, user: any) => {
     const task = await Task.findById(id)

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createTask, getTasks, getTaskById, updateTask, deleteTask} from "../services/task.service";
+import { asyncHandler } from "../utils/asyncHandler";
 
 export const create = async (req: any, res: Response) => {
     try{
@@ -10,14 +11,11 @@ export const create = async (req: any, res: Response) => {
     }
 };
 
-export const getAll = async (req: any, res: Response) => {
-    try{
-        const tasks = await getTasks(req.user);
-        res.json(tasks);
-    }catch(error){
-        res.status(400).json({message: (error as Error).message});
-    }
-};
+// req.query contains the key-value pairs found in the URL after the question mark (?). It is primarily used for filtering, sorting, or pagination.
+export const getAll = asyncHandler (async(req: any, res: Response) => {
+    const result = await getTasks(req.user, req.query);
+    res.json(result);
+});
 
 export const getOne = async (req: any, res: Response) => {
     try{
