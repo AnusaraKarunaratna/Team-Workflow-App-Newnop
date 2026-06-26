@@ -17,7 +17,7 @@ export const getTasks = async (user: any, query: any) => {
 
     const filter: any = {};
 
-    // RBAC
+    // Role Based Authorization 
     if (user.role !== "ADMIN") {
         filter.$or = [
             { createdBy: user.id },
