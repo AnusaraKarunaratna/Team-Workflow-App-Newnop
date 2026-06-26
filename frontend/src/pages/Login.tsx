@@ -1,40 +1,136 @@
-import {useState} from "react";
-import { useNavigate } from "react-router-dom";
-import {loginUser} from "../services/auth.service";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/auth.service";
+import toast from "react-hot-toast";
 
-export default function () {
-
+export default function Login() {
     const nav = useNavigate();
-    const [email,setEmail] = useState("");
-    const [password,setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const submit = async(e:any) =>{
+    const submit = async (e: any) => {
         e.preventDefault();
-
-        try{
-            const res = await loginUser({email,password});
+        try {
+            setLoading(true);
+            const res = await loginUser({ email, password });
             localStorage.setItem("token", res.data.token);
-            nav("/");
-        }catch{
-            alert("Login failed");
+            toast.success("Welcome back!");
+            nav("/dashboard");
+        } catch {
+            toast.error("Invalid email or password");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={submit}>
-            <input 
-                placeholder="Email"
-                value = {email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <input 
-                type="password"
-                placeholder="Password"
-                value = {password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
+        <div className="min-h-screen flex w-full bg-white font-sans">
+            
+            {/* Left Panel: Deep Navy Branding */}
+            <div className="hidden lg:flex w-1/2 bg-[#09152e] flex-col justify-center items-center p-12 rounded-r-[3.5rem] relative z-10 shadow-2xl">
+                <div className="max-w-md w-full flex flex-col items-center">
+                    
+                    {/* Simulated SLT Mobitel Logo Area */}
+                    <div className="mb-16 flex items-center gap-3">
+                        {/* Abstract slash logo */}
+                        <div className="flex gap-1.5 mr-2">
+                            <div className="w-2.5 h-10 bg-[#38bdf8] transform -skew-x-12"></div>
+                            <div className="w-2.5 h-10 bg-[#0284c7] transform -skew-x-12 mt-3"></div>
+                            <div className="w-2.5 h-10 bg-[#65a30d] transform -skew-x-12 mt-6"></div>
+                        </div>
+                        <div className="flex flex-col">
+                            <h1 className="text-5xl font-bold text-[#38bdf8] tracking-wide flex items-center">
+                                SLT<span className="text-[#65a30d]">MOBITEL</span>
+                            </h1>
+                            <p className="text-[#0284c7] text-sm font-medium tracking-widest mt-1 text-center mr-6">The Connection</p>
+                        </div>
+                    </div>
 
-            <button>Login</button>
-        </form>
+                    {/* Headline */}
+                    <h2 className="text-[2.5rem] font-bold text-[#38bdf8] text-center leading-tight">
+                        Business Continuity<br />Management System
+                    </h2>
+                </div>
+            </div>
+
+            {/* Right Panel: Login Form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-20 bg-white">
+                <div className="w-full max-w-md">
+                    
+                    {/* Header */}
+                    <div className="text-center mb-12">
+                        <h2 className="text-[28px] font-bold text-[#173062] mb-3">Welcome Back !</h2>
+                        <p className="text-[#173062] text-sm font-medium">Please fill your login details below.</p>
+                    </div>
+
+                    <form onSubmit={submit} className="space-y-6">
+                        {/* Email Input */}
+                        <div>
+                            <input
+                                type="email"
+                                required
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#173062] focus:border-[#173062] outline-none transition placeholder-gray-400 text-gray-800"
+                            />
+                        </div>
+
+                        {/* Password Input */}
+                        <div>
+                            <input
+                                type="password"
+                                required
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#173062] focus:border-[#173062] outline-none transition placeholder-gray-400 text-gray-800"
+                            />
+                        </div>
+
+                        {/* Remember Me */}
+                        <div className="flex items-center pt-2">
+                            <input
+                                id="remember"
+                                type="checkbox"
+                                className="h-4 w-4 text-[#173062] focus:ring-[#173062] border-gray-400 rounded cursor-pointer"
+                            />
+                            <label htmlFor="remember" className="ml-2 block text-sm font-medium text-[#173062] cursor-pointer">
+                                Remember me
+                            </label>
+                        </div>
+
+                        {/* Primary Gradient Button */}
+                        <div className="pt-2">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-gradient-to-r from-[#24457e] to-[#6a9f4c] hover:opacity-95 text-white font-bold py-3.5 rounded-xl transition shadow-md disabled:opacity-70 tracking-wide text-[15px]"
+                            >
+                                {loading ? "Logging in..." : "Log In"}
+                            </button>
+                        </div>
+                    </form>
+
+                    {/* Divider */}
+                    <div className="mt-10 flex items-center">
+                        <div className="flex-grow border-t border-[#173062]/30"></div>
+                        <span className="flex-shrink-0 mx-4 text-[#173062] text-sm font-medium">OR</span>
+                        <div className="flex-grow border-t border-[#6a9f4c]/40"></div>
+                    </div>
+
+                    {/* Join Link */}
+                    <p className="mt-8 text-center text-sm font-medium text-[#173062]">
+                        Don't Have an Account?{" "}
+                        <Link to="/register" className="text-[#6a9f4c] hover:text-[#527d3b] transition">
+                            Join Today!
+                        </Link>
+                    </p>
+
+                </div>
+            </div>
+            
+        </div>
     );
 }

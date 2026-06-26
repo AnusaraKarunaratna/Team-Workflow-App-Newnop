@@ -64,11 +64,14 @@ export const getTaskById = async (id: string, user: any) => {
 
     if (!task) throw new Error("Task not found");
 
+    const creatorId = (task.createdBy as any)?._id?.toString();
+    const assigneeId = (task.assignedTo as any)?._id?.toString();
+
     if(
         user.role !== "ADMIN" &&
-        task.createdBy.toString() !== user.id &&
+        creatorId !== user.id &&
         //? sign is used to accept null or undefined. Without this program will crash in those scenarios.
-        task.assignedTo?.toString() !== user.id
+        assigneeId !== user.id
     ) {
         throw new Error("Unauthorized");
     }
@@ -82,11 +85,25 @@ export const updateTask = async (id: string, data: any, user: any) => {
 
     if(!task) throw new Error("Task not found");
 
-    if(user.role !== "ADMIN" && task.createdBy.toString() !== user.id){
+    const isCreator = task.createdBy.toString() === user.id;
+    const isAssignee = task.assignedTo?.toString() === user.id;
+    const isAdmin = user.role === "ADMIN";
+
+    if(!isAdmin && !isCreator && !isAssignee){
         throw new Error("Unauthroized");
     }
 
-    return await Task.findByIdAndUpdate(id, data, { new: true});
+    let updatePayload = data;
+
+    if (!isAdmin && !isCreator && isAssignee) {
+        updatePayload = { status: data.status };
+    }
+
+    if (updatePayload.assignedTo === "") {
+        updatePayload.assignedTo = null; 
+    }
+
+    return await Task.findByIdAndUpdate(id, updatePayload, { new: true});
 }
 
 export const deleteTask = async ( id: string, user: any) => {
