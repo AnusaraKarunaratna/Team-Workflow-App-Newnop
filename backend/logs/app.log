@@ -1,3 +1,8 @@
 {"level":"info","message":{"method":"GET","time":"2026-06-26T08:21:14.751Z","url":"/api/tasks?page=1&limit=10"},"timestamp":"2026-06-26T08:21:14.753Z"}
 {"level":"info","message":{"method":"GET","time":"2026-06-26T08:22:22.513Z","url":"/api/tasks?status=OPEN"},"timestamp":"2026-06-26T08:22:22.514Z"}
 {"level":"info","message":{"method":"GET","time":"2026-06-26T08:23:16.167Z","url":"/api/tasks?priority=HIGH"},"timestamp":"2026-06-26T08:23:16.167Z"}
+{"level":"info","message":{"method":"GET","time":"2026-06-26T09:31:12.340Z","url":"/api/auth/me"},"timestamp":"2026-06-26T09:31:12.342Z"}
+{"level":"info","message":{"method":"GET","time":"2026-06-26T09:31:14.138Z","url":"/api/auth/me"},"timestamp":"2026-06-26T09:31:14.138Z"}
+{"level":"info","message":{"method":"GET","time":"2026-06-26T09:32:08.290Z","url":"/api/auth/me"},"timestamp":"2026-06-26T09:32:08.292Z"}
+{"level":"info","message":{"method":"GET","time":"2026-06-26T09:32:21.660Z","url":"/api/auth/me"},"timestamp":"2026-06-26T09:32:21.660Z"}
+{"level":"info","message":{"method":"GET","time":"2026-06-26T09:32:40.170Z","url":"/api/auth/me"},"timestamp":"2026-06-26T09:32:40.171Z"}
