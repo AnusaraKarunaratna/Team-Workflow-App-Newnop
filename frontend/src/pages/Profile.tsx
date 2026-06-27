@@ -33,7 +33,7 @@ export default function Profile() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 
                 {/* Decorative Header Banner */}
-                <div className="h-32 bg-gradient-to-r from-indigo-600 to-blue-500 relative">
+                <div className="h-32 bg-leaner-to-r from-indigo-600 to-blue-500 relative">
                     {/* Floating Avatar */}
                     <div className="absolute -bottom-12 left-8 w-24 h-24 rounded-full bg-white border-4 border-white shadow-md flex items-center justify-center text-4xl font-bold text-indigo-600">
                         {initial}

@@ -2,12 +2,17 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/auth.service";
 import toast from "react-hot-toast";
+import { useAuth } from "../hooks/useAuth";
+import background from "../assets/background.png";
 
 export default function Login() {
     const nav = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    
+    // Extract setUser from context
+    const { setUser } = useAuth();
 
     const submit = async (e: any) => {
         e.preventDefault();
@@ -15,6 +20,8 @@ export default function Login() {
             setLoading(true);
             const res = await loginUser({ email, password });
             localStorage.setItem("token", res.data.token);
+            //Update React's memory so Protected routes know you are logged in
+            setUser(res.data.user);
             toast.success("Welcome back!");
             nav("/dashboard");
         } catch {
@@ -27,31 +34,13 @@ export default function Login() {
     return (
         <div className="min-h-screen flex w-full bg-white font-sans">
             
-            {/* Left Panel: Deep Navy Branding */}
-            <div className="hidden lg:flex w-1/2 bg-[#09152e] flex-col justify-center items-center p-12 rounded-r-[3.5rem] relative z-10 shadow-2xl">
-                <div className="max-w-md w-full flex flex-col items-center">
-                    
-                    {/* Simulated SLT Mobitel Logo Area */}
-                    <div className="mb-16 flex items-center gap-3">
-                        {/* Abstract slash logo */}
-                        <div className="flex gap-1.5 mr-2">
-                            <div className="w-2.5 h-10 bg-[#38bdf8] transform -skew-x-12"></div>
-                            <div className="w-2.5 h-10 bg-[#0284c7] transform -skew-x-12 mt-3"></div>
-                            <div className="w-2.5 h-10 bg-[#65a30d] transform -skew-x-12 mt-6"></div>
-                        </div>
-                        <div className="flex flex-col">
-                            <h1 className="text-5xl font-bold text-[#38bdf8] tracking-wide flex items-center">
-                                SLT<span className="text-[#65a30d]">MOBITEL</span>
-                            </h1>
-                            <p className="text-[#0284c7] text-sm font-medium tracking-widest mt-1 text-center mr-6">The Connection</p>
-                        </div>
-                    </div>
-
-                    {/* Headline */}
-                    <h2 className="text-[2.5rem] font-bold text-[#38bdf8] text-center leading-tight">
-                        Business Continuity<br />Management System
-                    </h2>
-                </div>
+            {/* Left Panel: Full Cover Image */}
+            <div className="hidden lg:block w-1/2 relative z-10 shadow-2xl rounded-r-[3.5rem] overflow-hidden bg-gray-100">
+                <img 
+                    src={background}
+                    alt="Welcome" 
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
             </div>
 
             {/* Right Panel: Login Form */}
@@ -106,7 +95,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-[#24457e] to-[#6a9f4c] hover:opacity-95 text-white font-bold py-3.5 rounded-xl transition shadow-md disabled:opacity-70 tracking-wide text-[15px]"
+                                className="w-full bg-linear-to-r from-[#24457e] to-[#6a9f4c] hover:opacity-95 text-white font-bold py-3.5 rounded-xl transition shadow-md disabled:opacity-70 tracking-wide text-[15px]"
                             >
                                 {loading ? "Logging in..." : "Log In"}
                             </button>
@@ -115,9 +104,9 @@ export default function Login() {
 
                     {/* Divider */}
                     <div className="mt-10 flex items-center">
-                        <div className="flex-grow border-t border-[#173062]/30"></div>
-                        <span className="flex-shrink-0 mx-4 text-[#173062] text-sm font-medium">OR</span>
-                        <div className="flex-grow border-t border-[#6a9f4c]/40"></div>
+                        <div className="grow border-t border-[#173062]/30"></div>
+                        <span className="shrink-0 mx-4 text-[#173062] text-sm font-medium">OR</span>
+                        <div className="grow border-t border-[#6a9f4c]/40"></div>
                     </div>
 
                     {/* Join Link */}

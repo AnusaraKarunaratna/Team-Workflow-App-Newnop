@@ -12,4 +12,4 @@ export const logger = winston.createLogger({
             filename: "logs/app.log"
         }),
     ]
-})
+});

@@ -1,62 +1,84 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import logo from "../../assets/logo.png";
 
 export default function Navbar() {
     const { user, loading } = useAuth();
     const location = useLocation();
 
-    // Helper to style active navigation links
+    // Helper to determine if a route is currently active
     const isActive = (path: string) => location.pathname === path;
-    const linkClass = (path: string) => 
-        `transition-colors px-3 py-2 rounded-md text-sm font-medium ${
+
+    // Text link styling for both Logged-In and Logged-Out users
+    // Active = Solid Blue Button, Inactive = Text Link
+    const textLinkClass = (path: string) => 
+        `font-medium px-5 py-2 transition text-sm rounded-lg ${
             isActive(path) 
-            ? 'bg-indigo-800 text-white shadow-inner' 
-            : 'text-indigo-100 hover:bg-indigo-600 hover:text-white'
+            ? 'bg-[#173062] text-white shadow-sm' 
+            : 'text-[#173062] hover:text-[#0284c7] hover:bg-gray-50'
         }`;
 
     return (
-        <header className="h-16 px-6 bg-indigo-700 text-white flex justify-between items-center shadow-md z-10 sticky top-0 shrink-0">
-            <div className="flex items-center gap-8">
-                {/* Logo & Brand */}
-                <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition">
-                    <svg className="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <h1 className="text-xl font-bold tracking-wide hidden sm:block">Team Workflow</h1>
+        <header className="h-18 px-6 bg-white flex justify-between items-center border-b border-gray-200 sticky top-0 shrink-0 z-20">
+            
+            {/* Left: Standard Image Logo */}
+            <div className="shrink-0">
+                <Link to="/" className="flex items-center hover:opacity-90 transition">
+                    <img 
+                        src={logo}
+                        alt="Logo" 
+                        className="h-10 w-auto object-contain" 
+                    />
                 </Link>
+            </div>
 
-                {/* Main Navigation - Changes based on authentication */}
+            {/* Right: Navigation Links */}
+            <div className="flex items-center gap-4 shrink-0">
                 {!loading && (
-                    <nav className="flex items-center gap-2">
+                    <nav className="flex items-center gap-2 sm:gap-4">
                         {user ? (
                             <>
-                                <Link to="/" className={linkClass("/")}>Dashboard</Link>
-                                <Link to="/tasks" className={linkClass("/tasks")}>Tasks</Link>
-                                <Link to="/about" className={linkClass("/about")}>About</Link>
+                                {/* Logged-In State: Text Links */}
+                                <Link to="/dashboard" className={textLinkClass("/dashboard")}>
+                                    Dashboard
+                                </Link>
+                                <Link to="/tasks" className={textLinkClass("/tasks")}>
+                                    Tasks
+                                </Link>
+                                <Link to="/about" className={textLinkClass("/about")}>
+                                    About
+                                </Link>
+
+                                {/* Profile Avatar with First Initial */}
+                                <Link 
+                                    to="/profile" 
+                                    className={`ml-2 flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm transition-all ${
+                                        isActive("/profile")
+                                        ? 'bg-[#173062] text-white ring-2 ring-offset-2 ring-[#173062]'
+                                        : 'bg-gray-100 text-[#173062] hover:bg-[#173062] hover:text-white'
+                                    }`}
+                                    title="Profile"
+                                >
+                                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                                </Link>
                             </>
                         ) : (
                             <>
-                                <Link to="/about" className={linkClass("/about")}>About</Link>
-                                <Link to="/login" className={linkClass("/login")}>Login</Link>
-                                <Link to="/register" className={linkClass("/register")}>Register</Link>
+                                {/* Logged-Out State: Text Links */}
+                                <Link to="/about" className={textLinkClass("/about")}>
+                                    About
+                                </Link>
+                                <Link to="/login" className={textLinkClass("/login")}>
+                                    Sign In
+                                </Link>
+                                <Link to="/register" className={textLinkClass("/register")}>
+                                    Register
+                                </Link>
                             </>
                         )}
                     </nav>
                 )}
             </div>
-            
-            {/* Profile Avatar (Only shows if logged in) */}
-            {user && (
-                <Link 
-                    to="/profile" 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-800 hover:bg-indigo-900 border-2 border-indigo-500 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700"
-                    title="View Profile"
-                >
-                    <span className="font-bold text-sm tracking-widest text-indigo-100">
-                        {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-                    </span>
-                </Link>
-            )}
         </header>
     );
 }
