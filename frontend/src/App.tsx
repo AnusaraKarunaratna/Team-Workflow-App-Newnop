@@ -10,6 +10,7 @@ import TaskDetails from "./pages/tasks/TaskDetails";
 import EditTask from "./pages/tasks/EditTask";
 import CreateTask from "./pages/tasks/CreateTask";
 import Profile from "./pages/Profile";
+import About from "./pages/About";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             {/* Flatten these routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<About />} />
 
             <Route path="/dashboard" element={
               <Protected><Dashboard /></Protected>

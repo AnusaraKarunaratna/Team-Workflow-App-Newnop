@@ -4,7 +4,6 @@ import Sidebar from "../components/layout/Sidebar";
 import { useAuth } from "../hooks/useAuth";
 import { getTasks } from "../services/tasks.service";
 
-// Helper to format due dates
 const formatDueTime = (diffHours: number) => {
     if (diffHours < 0) {
         const absHours = Math.abs(diffHours);
@@ -93,188 +92,199 @@ export default function Dashboard() {
     const calcWidth = (val: number, total: number) => total === 0 ? '0%' : `${(val / total) * 100}%`;
 
     return (
-        <div className="h-screen flex bg-[#f8fafc]">
+        // FIX: Replaced 'h-screen max-h-screen' with 'flex-1 h-full min-h-0'
+        <div className="flex flex-1 h-full min-h-0 bg-gray-50 overflow-hidden font-sans w-full">
             <Sidebar />
             
-            <main className="flex-1 flex flex-col xl:flex-row overflow-hidden">
-                
-                {/* Main Content Area (Stats & Overviews) */}
-                <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-hide">
-                    <header className="mb-10 flex justify-between items-end">
+            <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 min-h-full flex flex-col p-8">
+                    
+                    {/* Header Section */}
+                    <div className="flex justify-between items-start mb-8">
                         <div>
-                            <h2 className="text-3xl font-bold text-[#173062] tracking-tight">Dashboard</h2>
-                            <p className="text-gray-500 mt-1 font-medium">
-                                Welcome back, <span className="text-[#0284c7]">{user?.name}</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                <span>Overview</span>
+                            </div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+                            <p className="text-gray-500 text-sm">
+                                Welcome back, <span className="font-semibold text-indigo-600">{user?.name}</span>
                             </p>
                         </div>
                         <div className="text-right hidden sm:block">
-                            <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Today</p>
-                            <p className="text-[#173062] font-semibold">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Today</p>
+                            <p className="text-gray-800 font-medium text-sm border border-gray-200 bg-gray-50 px-3 py-1.5 rounded-lg">
+                                {new Date().toLocaleDateString('en-GB', { weekday: 'long', month: 'short', day: 'numeric' })}
+                            </p>
                         </div>
-                    </header>
+                    </div>
 
                     {user?.role === "ADMIN" && (
-                        <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-xl mb-8 shadow-sm flex items-start gap-4">
-                            <div className="p-2 bg-emerald-100 rounded-lg text-emerald-700 mt-0.5">
+                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-8 flex items-start gap-4">
+                            <div className="p-2 bg-indigo-100 rounded-lg text-indigo-700 mt-0.5">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <div>
-                                <h3 className="font-bold text-emerald-900">Admin Privileges Active</h3>
-                                <p className="text-sm text-emerald-700 font-medium mt-0.5">You have elevated access to view and manage all workspace activities.</p>
+                                <h3 className="text-sm font-bold text-indigo-900">Admin Privileges Active</h3>
+                                <p className="text-xs text-indigo-700 font-medium mt-1">You have elevated access to view and manage all workspace activities.</p>
                             </div>
                         </div>
                     )}
 
                     {loading ? (
-                        <div className="h-64 flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#173062]"></div>
+                        <div className="flex-1 flex justify-center items-center">
+                            <p className="text-gray-400 text-sm animate-pulse">Loading dashboard...</p>
                         </div>
                     ) : (
-                        <div className="space-y-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             
-                            {/* TASKS ASSIGNED TO ME */}
-                            <section className="bg-white rounded-2xl p-6 lg:p-8 shadow-sm border border-gray-100 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#38bdf8]"></div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-xl font-bold text-[#173062]">Tasks Assigned to Me</h3>
-                                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-bold">{assignedStats.total} Total</span>
-                                </div>
+                            {/* Left Column: Stats */}
+                            <div className="col-span-2 space-y-8">
                                 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Open</p>
-                                        <p className="text-2xl font-black text-gray-800">{assignedStats.OPEN}</p>
+                                {/* TASKS ASSIGNED TO ME */}
+                                <section className="border border-gray-100 rounded-2xl p-6 hover:shadow-sm transition-shadow">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-lg font-bold text-gray-900">Tasks Assigned to Me</h3>
+                                        <span className="bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{assignedStats.total} Total</span>
                                     </div>
-                                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                        <p className="text-xs font-bold text-blue-600 uppercase mb-1">In Progress</p>
-                                        <p className="text-2xl font-black text-blue-900">{assignedStats.IN_PROGRESS}</p>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Open</p>
+                                            <p className="text-2xl font-black text-gray-800">{assignedStats.OPEN}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">In Progress</p>
+                                            <p className="text-2xl font-black text-blue-600">{assignedStats.IN_PROGRESS}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-purple-500 uppercase tracking-wider mb-1">Testing</p>
+                                            <p className="text-2xl font-black text-purple-600">{assignedStats.TESTING}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-1">Done</p>
+                                            <p className="text-2xl font-black text-emerald-600">{assignedStats.DONE}</p>
+                                        </div>
                                     </div>
-                                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                                        <p className="text-xs font-bold text-purple-600 uppercase mb-1">Testing</p>
-                                        <p className="text-2xl font-black text-purple-900">{assignedStats.TESTING}</p>
+
+                                    {/* Visual Progress Bar */}
+                                    <div>
+                                        <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                            <span>Progress Distribution</span>
+                                            <span className="text-emerald-600">{assignedStats.total > 0 ? Math.round((assignedStats.DONE / assignedStats.total) * 100) : 0}% Completed</span>
+                                        </div>
+                                        <div className="h-2 w-full bg-gray-100 rounded-full flex overflow-hidden">
+                                            <div style={{ width: calcWidth(assignedStats.DONE, assignedStats.total) }} className="bg-emerald-500 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(assignedStats.TESTING, assignedStats.total) }} className="bg-purple-400 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(assignedStats.IN_PROGRESS, assignedStats.total) }} className="bg-blue-400 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(assignedStats.OPEN, assignedStats.total) }} className="bg-gray-300 transition-all duration-1000"></div>
+                                        </div>
                                     </div>
-                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                                        <p className="text-xs font-bold text-emerald-600 uppercase mb-1">Done</p>
-                                        <p className="text-2xl font-black text-emerald-900">{assignedStats.DONE}</p>
+                                </section>
+
+                                {/* MY CREATED TASKS */}
+                                <section className="border border-gray-100 rounded-2xl p-6 hover:shadow-sm transition-shadow">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-lg font-bold text-gray-900">Tasks I've Delegated</h3>
+                                        <span className="bg-gray-50 border border-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{createdStats.total} Total</span>
                                     </div>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Open</p>
+                                            <p className="text-2xl font-black text-gray-800">{createdStats.OPEN}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">In Progress</p>
+                                            <p className="text-2xl font-black text-blue-600">{createdStats.IN_PROGRESS}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-purple-500 uppercase tracking-wider mb-1">Testing</p>
+                                            <p className="text-2xl font-black text-purple-600">{createdStats.TESTING}</p>
+                                        </div>
+                                        <div className="p-4 bg-white border border-gray-100 rounded-xl">
+                                            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-1">Done</p>
+                                            <p className="text-2xl font-black text-emerald-600">{createdStats.DONE}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Visual Progress Bar */}
+                                    <div>
+                                        <div className="h-2 w-full bg-gray-100 rounded-full flex overflow-hidden">
+                                            <div style={{ width: calcWidth(createdStats.DONE, createdStats.total) }} className="bg-emerald-500 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(createdStats.TESTING, createdStats.total) }} className="bg-purple-400 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(createdStats.IN_PROGRESS, createdStats.total) }} className="bg-blue-400 transition-all duration-1000"></div>
+                                            <div style={{ width: calcWidth(createdStats.OPEN, createdStats.total) }} className="bg-gray-300 transition-all duration-1000"></div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                            </div>
+
+                            {/* Right Column: Priority Inbox */}
+                            {/* FIX: min-h-100 was invalid in Tailwind, updated to min-h-[400px] */}
+                            <aside className="col-span-1 bg-gray-50/50 border border-gray-100 rounded-2xl p-6 flex flex-col h-full min-h-100">
+                                <div className="mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <h3 className="text-lg font-bold text-gray-900">Priority Inbox</h3>
+                                        <div className="bg-red-50 text-red-600 p-1.5 rounded-md">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1 font-medium">Tasks needing immediate attention.</p>
                                 </div>
 
-                                {/* Visual Progress Bar */}
-                                <div>
-                                    <div className="flex justify-between text-xs font-bold text-gray-400 uppercase mb-2">
-                                        <span>Progress Distribution</span>
-                                        <span className="text-[#65a30d]">{assignedStats.total > 0 ? Math.round((assignedStats.DONE / assignedStats.total) * 100) : 0}% Completed</span>
-                                    </div>
-                                    <div className="h-3 w-full bg-gray-100 rounded-full flex overflow-hidden">
-                                        <div style={{ width: calcWidth(assignedStats.DONE, assignedStats.total) }} className="bg-[#65a30d] transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(assignedStats.TESTING, assignedStats.total) }} className="bg-purple-400 transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(assignedStats.IN_PROGRESS, assignedStats.total) }} className="bg-[#38bdf8] transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(assignedStats.OPEN, assignedStats.total) }} className="bg-gray-300 transition-all duration-1000"></div>
-                                    </div>
+                                <div className="flex-1 overflow-y-auto pr-1">
+                                    {!loading && dueSoonTasks.length === 0 ? (
+                                        <div className="text-center py-10">
+                                            <p className="text-gray-400 text-sm font-medium">You're all caught up!</p>
+                                            <p className="text-xs text-gray-400 mt-1">No tasks due within 48 hours.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {dueSoonTasks.map(task => {
+                                                const isOverdue = task.diffHours < 0;
+                                                
+                                                return (
+                                                    <Link 
+                                                        key={task._id} 
+                                                        to={`/tasks/${task._id}`}
+                                                        className="block p-4 rounded-xl border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm transition group"
+                                                    >
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                                                isOverdue ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'
+                                                            }`}>
+                                                                {formatDueTime(task.diffHours)}
+                                                            </span>
+                                                            <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                                                                {task.isAssignee ? 'Assigned to Me' : 'Delegated'}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <h4 className="font-semibold text-gray-800 text-sm mb-2 group-hover:text-indigo-600 transition line-clamp-2">
+                                                            {task.title}
+                                                        </h4>
+                                                        
+                                                        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${
+                                                                task.status === 'OPEN' ? 'bg-gray-400' :
+                                                                task.status === 'IN_PROGRESS' ? 'bg-blue-400' :
+                                                                task.status === 'TESTING' ? 'bg-purple-400' : 'bg-emerald-400'
+                                                            }`}></span>
+                                                            {task.status.replace('_', ' ')}
+                                                        </div>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            </section>
-
-                            {/* MY CREATED TASKS */}
-                            <section className="bg-white rounded-2xl p-6 lg:p-8 shadow-sm border border-gray-100 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#65a30d]"></div>
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-xl font-bold text-[#173062]">Tasks I've Delegated</h3>
-                                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-bold">{createdStats.total} Total</span>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Open</p>
-                                        <p className="text-2xl font-black text-gray-800">{createdStats.OPEN}</p>
-                                    </div>
-                                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                        <p className="text-xs font-bold text-blue-600 uppercase mb-1">In Progress</p>
-                                        <p className="text-2xl font-black text-blue-900">{createdStats.IN_PROGRESS}</p>
-                                    </div>
-                                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                                        <p className="text-xs font-bold text-purple-600 uppercase mb-1">Testing</p>
-                                        <p className="text-2xl font-black text-purple-900">{createdStats.TESTING}</p>
-                                    </div>
-                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                                        <p className="text-xs font-bold text-emerald-600 uppercase mb-1">Done</p>
-                                        <p className="text-2xl font-black text-emerald-900">{createdStats.DONE}</p>
-                                    </div>
-                                </div>
-
-                                {/* Visual Progress Bar */}
-                                <div>
-                                    <div className="h-3 w-full bg-gray-100 rounded-full flex overflow-hidden mt-6">
-                                        <div style={{ width: calcWidth(createdStats.DONE, createdStats.total) }} className="bg-[#65a30d] transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(createdStats.TESTING, createdStats.total) }} className="bg-purple-400 transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(createdStats.IN_PROGRESS, createdStats.total) }} className="bg-[#38bdf8] transition-all duration-1000"></div>
-                                        <div style={{ width: calcWidth(createdStats.OPEN, createdStats.total) }} className="bg-gray-300 transition-all duration-1000"></div>
-                                    </div>
-                                </div>
-                            </section>
+                            </aside>
 
                         </div>
                     )}
                 </div>
-
-                {/* Right Sidebar (Priority & Due Soon) */}
-                <aside className="w-full xl:w-96 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
-                    <div className="p-6 border-b border-gray-100 bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-red-100 rounded-lg text-red-600">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                            <h3 className="text-lg font-bold text-[#173062]">Priority Inbox</h3>
-                        </div>
-                        <p className="text-sm text-gray-500 mt-2 font-medium">Tasks needing immediate attention.</p>
-                    </div>
-
-                    <div className="p-6 flex-1">
-                        {!loading && dueSoonTasks.length === 0 ? (
-                            <div className="text-center py-10">
-                                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                                </div>
-                                <p className="text-gray-900 font-bold">You're all caught up!</p>
-                                <p className="text-sm text-gray-500 mt-1">No tasks due within 48 hours.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {dueSoonTasks.map(task => {
-                                    const isOverdue = task.diffHours < 0;
-                                    
-                                    return (
-                                        <Link 
-                                            key={task._id} 
-                                            to={`/tasks/${task._id}`}
-                                            className="block p-4 rounded-xl border border-gray-100 bg-white hover:border-[#38bdf8] hover:shadow-md transition group"
-                                        >
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                                    isOverdue ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
-                                                }`}>
-                                                    {formatDueTime(task.diffHours)}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded uppercase">
-                                                    {task.isAssignee ? 'For Me' : 'Delegated'}
-                                                </span>
-                                            </div>
-                                            
-                                            <h4 className="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#0284c7] transition line-clamp-2">
-                                                {task.title}
-                                            </h4>
-                                            
-                                            <div className="flex items-center gap-2 mt-3 text-xs font-medium text-gray-500">
-                                                <span className="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
-                                                {task.status.replace('_', ' ')}
-                                            </div>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                </aside>
-
             </main>
         </div>
     );

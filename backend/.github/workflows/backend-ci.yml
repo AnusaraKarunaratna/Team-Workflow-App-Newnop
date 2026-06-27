@@ -18,4 +18,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Run Tests
-        run: npm run test # Uses the test script we defined previously
+        run: npm run test 
