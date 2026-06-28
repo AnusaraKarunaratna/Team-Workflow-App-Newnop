@@ -19,4 +19,4 @@ const logger = winston.createLogger({
   transports: transports
 });
 
-export { logger }
+export default logger;
