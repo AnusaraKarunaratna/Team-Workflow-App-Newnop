@@ -36,9 +36,10 @@ export const update = async (req: any, res: Response) => {
 };
 
 export const remove = async (req: any, res: Response) => {
-    try{
+    try {
         const result = await deleteTask(req.params.id, req.user);
-    }catch(error){
-        res.status(400).json({message: (error as Error).message});
+        res.status(200).json(result); 
+    } catch(error) {
+        res.status(400).json({ message: (error as Error).message });
     }
 };

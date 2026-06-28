@@ -1,8 +1,7 @@
-import { getAssetKeys } from "node:sea";
 import Task from "../models/Task";
+import User from "../models/User"; 
 
 export const createTask = async (data: any, userId: string) => {
-    //This takes all the properties inside the dataobject and create a new object with createdBy field.
     return await Task.create({
         ...data,
         createdBy: userId,
@@ -17,8 +16,11 @@ export const getTasks = async (user: any, query: any) => {
 
     const filter: any = {};
 
-    // RBAC
-    if (user.role !== "ADMIN") {
+    // Fetch the actual user from the DB to check their real role
+    const currentUser = await User.findById(user.id);
+
+    // Role Based Authorization 
+    if (currentUser?.role !== "ADMIN") {
         filter.$or = [
             { createdBy: user.id },
             { assignedTo: user.id} 
@@ -29,11 +31,10 @@ export const getTasks = async (user: any, query: any) => {
     if (query.status) filter.status = query.status;
     if (query.priority) filter.priority = query.priority;
 
-    // search 
+    // Search 
     if (query.search) {
         filter.title = {
             $regex : query.search,
-            //"i" stands for Case-Insensitivity.
             $options: "i",
         };
     }
@@ -64,11 +65,15 @@ export const getTaskById = async (id: string, user: any) => {
 
     if (!task) throw new Error("Task not found");
 
+    // Fetch the actual user
+    const currentUser = await User.findById(user.id);
+    const creatorId = (task.createdBy as any)?._id?.toString();
+    const assigneeId = (task.assignedTo as any)?._id?.toString();
+
     if(
-        user.role !== "ADMIN" &&
-        task.createdBy.toString() !== user.id &&
-        //? sign is used to accept null or undefined. Without this program will crash in those scenarios.
-        task.assignedTo?.toString() !== user.id
+        currentUser?.role !== "ADMIN" &&
+        creatorId !== user.id &&
+        assigneeId !== user.id
     ) {
         throw new Error("Unauthorized");
     }
@@ -82,11 +87,27 @@ export const updateTask = async (id: string, data: any, user: any) => {
 
     if(!task) throw new Error("Task not found");
 
-    if(user.role !== "ADMIN" && task.createdBy.toString() !== user.id){
-        throw new Error("Unauthroized");
+    // Fetch the actual user
+    const currentUser = await User.findById(user.id);
+    const isCreator = task.createdBy.toString() === user.id;
+    const isAssignee = task.assignedTo?.toString() === user.id;
+    const isAdmin = currentUser?.role === "ADMIN";
+
+    if(!isAdmin && !isCreator && !isAssignee){
+        throw new Error("Unauthorized");
     }
 
-    return await Task.findByIdAndUpdate(id, data, { new: true});
+    let updatePayload = data;
+
+    if (!isAdmin && !isCreator && isAssignee) {
+        updatePayload = { status: data.status };
+    }
+
+    if (updatePayload.assignedTo === "") {
+        updatePayload.assignedTo = null; 
+    }
+
+    return await Task.findByIdAndUpdate(id, updatePayload, { new: true});
 }
 
 export const deleteTask = async ( id: string, user: any) => {
@@ -94,12 +115,13 @@ export const deleteTask = async ( id: string, user: any) => {
 
     if(!task) throw new Error ("Task not found");
 
-    if(user.role !== "ADMIN" && task.createdBy.toString() !== user.id) {
-        throw new Error("Unauthroized");
+    // Fetch the actual user
+    const currentUser = await User.findById(user.id);
+
+    if(currentUser?.role !== "ADMIN" && task.createdBy.toString() !== user.id) {
+        throw new Error("Unauthorized");
     }
 
     await Task.findByIdAndDelete(id);
     return { message: "Task deleted"};
 }
-
-//populate is like JOIN is sql

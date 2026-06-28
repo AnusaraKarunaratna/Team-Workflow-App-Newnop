@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     "target": "ES2022",
@@ -16,11 +16,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
 
-    "types": ["node"]
+    "types": ["node" ,"jest"]
   },
 
   "include": [
-    "src"
+    "src",
+    "tests"
   ],
 
   "exclude": [
