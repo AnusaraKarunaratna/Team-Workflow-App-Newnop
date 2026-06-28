@@ -1,0 +1,5 @@
+# Ignore everything in the logs directory
+logs/*
+
+# But do not ignore the .gitkeep file so the folder stays in the repo
+!logs/.gitkeep

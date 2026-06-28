@@ -23,6 +23,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     
     // Categorized Stats
+    const [allStats, setAllStats] = useState({ OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 });
     const [createdStats, setCreatedStats] = useState({ OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 });
     const [assignedStats, setAssignedStats] = useState({ OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 });
     
@@ -33,9 +34,10 @@ export default function Dashboard() {
         const fetchDashboardData = async () => {
             if (!user) return;
             try {
-                const res = await getTasks({ limit: 200 }); // Fetch a healthy amount to calculate stats
+                const res = await getTasks({ limit: 200 }); 
                 const tasks = res.data.data || [];
                 
+                const glStats = { OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 };
                 const cStats = { OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 };
                 const aStats = { OPEN: 0, IN_PROGRESS: 0, TESTING: 0, DONE: 0, total: 0 };
                 const urgent: any[] = [];
@@ -47,6 +49,10 @@ export default function Dashboard() {
                     const assigneeId = t.assignedTo?._id || t.assignedTo;
                     const isCreator = creatorId === currentUserId;
                     const isAssignee = assigneeId === currentUserId;
+
+                    // Tally Global (Admin View)
+                    glStats[t.status as keyof typeof glStats] = (glStats[t.status as keyof typeof glStats] || 0) + 1;
+                    glStats.total++;
 
                     // Tally Created
                     if (isCreator) {
@@ -62,11 +68,10 @@ export default function Dashboard() {
                     // Calculate Due Soon (Assigned to me OR Created by me, NOT DONE, Due within 48h or Overdue)
                     if ((isCreator || isAssignee) && t.status !== 'DONE' && t.dueDate) {
                         const dueDate = new Date(t.dueDate);
-                        // Add 23:59:59 to the due date to make it end-of-day
                         dueDate.setHours(23, 59, 59, 999);
                         const diffHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
                         
-                        if (diffHours <= 48) { // 48 hours or overdue
+                        if (diffHours <= 48) { 
                             urgent.push({ ...t, diffHours, isAssignee });
                         }
                     }
@@ -75,9 +80,10 @@ export default function Dashboard() {
                 // Sort urgent tasks: most overdue/closest first
                 urgent.sort((a, b) => a.diffHours - b.diffHours);
 
+                setAllStats(glStats);
                 setCreatedStats(cStats);
                 setAssignedStats(aStats);
-                setDueSoonTasks(urgent.slice(0, 6)); // Keep top 6 urgent
+                setDueSoonTasks(urgent.slice(0, 6)); 
             } catch (error) {
                 console.error("Failed to load dashboard stats", error);
             } finally {
@@ -92,7 +98,6 @@ export default function Dashboard() {
     const calcWidth = (val: number, total: number) => total === 0 ? '0%' : `${(val / total) * 100}%`;
 
     return (
-        // FIX: Replaced 'h-screen max-h-screen' with 'flex-1 h-full min-h-0'
         <div className="flex flex-1 h-full min-h-0 bg-gray-50 overflow-hidden font-sans w-full">
             <Sidebar />
             
@@ -108,7 +113,7 @@ export default function Dashboard() {
                             </div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
                             <p className="text-gray-500 text-sm">
-                                Welcome back, <span className="font-semibold text-indigo-600">{user?.name}</span>
+                                Welcome back, <span className="font-semibold text-[#173062]">{user?.name}</span>
                             </p>
                         </div>
                         <div className="text-right hidden sm:block">
@@ -120,26 +125,72 @@ export default function Dashboard() {
                     </div>
 
                     {user?.role === "ADMIN" && (
-                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-8 flex items-start gap-4">
-                            <div className="p-2 bg-indigo-100 rounded-lg text-indigo-700 mt-0.5">
+                        <div className="bg-[#173062]/5 border border-[#173062]/20 p-4 rounded-xl mb-8 flex items-start gap-4">
+                            <div className="p-2 bg-[#173062]/10 rounded-lg text-[#173062] mt-0.5">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <div>
-                                <h3 className="text-sm font-bold text-indigo-900">Admin Privileges Active</h3>
-                                <p className="text-xs text-indigo-700 font-medium mt-1">You have elevated access to view and manage all workspace activities.</p>
+                                <h3 className="text-sm font-bold text-[#173062]">Admin Privileges Active</h3>
+                                <p className="text-xs text-[#173062]/80 font-medium mt-1">You have elevated access to view and manage all workspace activities.</p>
                             </div>
                         </div>
                     )}
 
                     {loading ? (
                         <div className="flex-1 flex justify-center items-center">
-                            <p className="text-gray-400 text-sm animate-pulse">Loading dashboard...</p>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#173062]"></div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             
                             {/* Left Column: Stats */}
                             <div className="col-span-2 space-y-8">
+
+                                {/* GLOBAL WORKSPACE TASKS (ADMIN ONLY) */}
+                                {user?.role === "ADMIN" && (
+                                    <section className="bg-[#081c43] rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden">
+                                        {/* Decorative background shape */}
+                                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
+                                        
+                                        <div className="flex justify-between items-center mb-6 relative z-10">
+                                            <h3 className="text-lg font-bold text-white">Global Workspace Overview</h3>
+                                            <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">{allStats.total} Total Tasks</span>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 relative z-10">
+                                            <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl">
+                                                <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">Open</p>
+                                                <p className="text-2xl font-black text-white">{allStats.OPEN}</p>
+                                            </div>
+                                            <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl">
+                                                <p className="text-[10px] font-bold text-[#38bdf8] uppercase tracking-wider mb-1">In Progress</p>
+                                                <p className="text-2xl font-black text-white">{allStats.IN_PROGRESS}</p>
+                                            </div>
+                                            <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl">
+                                                <p className="text-[10px] font-bold text-[#c084fc] uppercase tracking-wider mb-1">Testing</p>
+                                                <p className="text-2xl font-black text-white">{allStats.TESTING}</p>
+                                            </div>
+                                            <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl">
+                                                <p className="text-[10px] font-bold text-[#52b618] uppercase tracking-wider mb-1">Done</p>
+                                                <p className="text-2xl font-black text-white">{allStats.DONE}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Visual Progress Bar */}
+                                        <div className="relative z-10">
+                                            <div className="flex justify-between text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2">
+                                                <span>System-Wide Progress</span>
+                                                <span className="text-white">{allStats.total > 0 ? Math.round((allStats.DONE / allStats.total) * 100) : 0}% Completed</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-black/20 rounded-full flex overflow-hidden">
+                                                <div style={{ width: calcWidth(allStats.DONE, allStats.total) }} className="bg-[#6a9f4c] transition-all duration-1000"></div>
+                                                <div style={{ width: calcWidth(allStats.TESTING, allStats.total) }} className="bg-[#c084fc] transition-all duration-1000"></div>
+                                                <div style={{ width: calcWidth(allStats.IN_PROGRESS, allStats.total) }} className="bg-[#38bdf8] transition-all duration-1000"></div>
+                                                <div style={{ width: calcWidth(allStats.OPEN, allStats.total) }} className="bg-white/30 transition-all duration-1000"></div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
                                 
                                 {/* TASKS ASSIGNED TO ME */}
                                 <section className="border border-gray-100 rounded-2xl p-6 hover:shadow-sm transition-shadow">
@@ -222,7 +273,6 @@ export default function Dashboard() {
                             </div>
 
                             {/* Right Column: Priority Inbox */}
-                            {/* FIX: min-h-100 was invalid in Tailwind, updated to min-h-[400px] */}
                             <aside className="col-span-1 bg-gray-50/50 border border-gray-100 rounded-2xl p-6 flex flex-col h-full min-h-100">
                                 <div className="mb-6">
                                     <div className="flex items-center gap-3">
@@ -249,7 +299,7 @@ export default function Dashboard() {
                                                     <Link 
                                                         key={task._id} 
                                                         to={`/tasks/${task._id}`}
-                                                        className="block p-4 rounded-xl border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm transition group"
+                                                        className="block p-4 rounded-xl border border-gray-200 bg-white hover:border-[#173062]/30 hover:shadow-sm transition group"
                                                     >
                                                         <div className="flex justify-between items-start mb-2">
                                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
@@ -262,7 +312,7 @@ export default function Dashboard() {
                                                             </span>
                                                         </div>
                                                         
-                                                        <h4 className="font-semibold text-gray-800 text-sm mb-2 group-hover:text-indigo-600 transition line-clamp-2">
+                                                        <h4 className="font-semibold text-gray-800 text-sm mb-2 group-hover:text-[#173062] transition line-clamp-2">
                                                             {task.title}
                                                         </h4>
                                                         

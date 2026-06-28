@@ -21,7 +21,7 @@ export default function Navbar() {
     return (
         <header className="h-18 px-6 bg-white flex justify-between items-center border-b border-gray-200 sticky top-0 shrink-0 z-20">
             
-            {/* Left: Standard Image Logo */}
+            {/* Image Logo */}
             <div className="shrink-0">
                 <Link to="/" className="flex items-center hover:opacity-90 transition">
                     <img 
@@ -45,7 +45,7 @@ export default function Navbar() {
                                 <Link to="/tasks" className={textLinkClass("/tasks")}>
                                     Tasks
                                 </Link>
-                                <Link to="/about" className={textLinkClass("/about")}>
+                                <Link to="/" className={textLinkClass("/")}>
                                     About
                                 </Link>
 
@@ -65,7 +65,7 @@ export default function Navbar() {
                         ) : (
                             <>
                                 {/* Logged-Out State: Text Links */}
-                                <Link to="/about" className={textLinkClass("/about")}>
+                                <Link to="/" className={textLinkClass("/")}>
                                     About
                                 </Link>
                                 <Link to="/login" className={textLinkClass("/login")}>

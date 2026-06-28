@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/auth.service";
 import toast from "react-hot-toast";
-import background from "../assets/background.png"
+import background from "../assets/background.png";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Register() {
     const nav = useNavigate();
@@ -10,14 +11,17 @@ export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const { setUser } = useAuth();
 
     const submit = async (e: any) => {
         e.preventDefault();
         try {
             setLoading(true);
-            await registerUser({ name, email, password });
+            const res = await registerUser({ name, email, password });
+            localStorage.setItem("token", res.data.token);
+            setUser(res.data.user);
             toast.success("Account created successfully!");
-            nav("/");
+            nav("/dashboard");
         } catch {
             toast.error("Registration failed. Please try again.");
         } finally {

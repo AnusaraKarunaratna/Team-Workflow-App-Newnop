@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function LandingPage() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans selection:bg-[#5c61ff] selection:text-white pb-8">
-            
+
             {/* Custom Styles for Marquee Animation */}
             <style>{`
                 @keyframes marquee {
@@ -18,7 +18,7 @@ export default function LandingPage() {
             {/* HERO SECTION */}
             <div className="p-4 md:p-6">
                 <div className="relative bg-[#0a0d55] rounded-[3rem] text-white overflow-hidden pt-24 md:pt-32 flex flex-col items-center text-center shadow-xl border border-indigo-400/30">
-                    
+
                     {/* Subtle background patterns */}
                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
 
@@ -33,7 +33,7 @@ export default function LandingPage() {
                             Manage your projects <br />
                             <span className="italic font-black mt-2 inline-block">Faster than ever</span>
                         </h1>
-                        
+
                         <p className="text-indigo-100 text-lg md:text-xl font-medium mb-8 max-w-2xl mx-auto">
                             Complete Task Management with powerful CRUD capabilities.
                         </p>
@@ -45,9 +45,9 @@ export default function LandingPage() {
 
                     {/* Hero Graphic Workspace */}
                     <div className="relative w-full max-w-5xl mx-auto mt-4 px-4 md:px-0 h-75 md:h-87.5">
-                        <img 
-                            src="https://images.unsplash.com/photo-1542621334-a254cf47733d?q=80&w=2000&auto=format&fit=crop" 
-                            alt="Workspace" 
+                        <img
+                            src="https://images.unsplash.com/photo-1542621334-a254cf47733d?q=80&w=2000&auto=format&fit=crop"
+                            alt="Workspace"
                             className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full md:w-[80%] h-full object-cover object-top rounded-t-3xl shadow-2xl opacity-90 border-t border-x border-white/20"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-[#46489e] via-transparent to-transparent z-10"></div>
@@ -73,17 +73,17 @@ export default function LandingPage() {
             <div className="bg-gray-50 border-b border-gray-200 py-4 overflow-hidden flex whitespace-nowrap relative">
                 <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-gray-50 to-transparent z-10"></div>
                 <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-gray-50 to-transparent z-10"></div>
-                
+
                 <div className="animate-marquee flex gap-12 items-center text-xs font-bold text-gray-500 uppercase tracking-widest w-[200%]">
                     <div className="flex gap-12 items-center min-w-full justify-around">
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Slack</span><span className="text-gray-300">/</span>
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Trello</span><span className="text-gray-300">/</span>
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Notion</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Create Tasks</span><span className="text-gray-300">/</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Assign Teams</span><span className="text-gray-300">/</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Track Progress</span>
                     </div>
                     <div className="flex gap-12 items-center min-w-full justify-around">
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Slack</span><span className="text-gray-300">/</span>
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Trello</span><span className="text-gray-300">/</span>
-                        <span>Trusted by fast-growing companies</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Notion</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Create Tasks</span><span className="text-gray-300">/</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Assign Teams</span><span className="text-gray-300">/</span>
+                        <span>Master Your Workflow</span><span className="text-gray-300">/</span><span className="text-gray-900 text-base">Track Progress</span>
                     </div>
                 </div>
             </div>
@@ -91,7 +91,7 @@ export default function LandingPage() {
             {/* SECONDARY SECTION (The 'Why' Behind) */}
             <section className="max-w-7xl mx-auto px-6 py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    
+
                     <div className="order-2 lg:order-1">
                         <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase leading-tight tracking-tight">
                             The "Why" Behind <br />
@@ -116,12 +116,12 @@ export default function LandingPage() {
 
                     <div className="order-1 lg:order-2 relative h-87.5 md:h-100 w-full flex justify-center items-center">
                         <div className="absolute inset-0 bg-linear-to-tr from-gray-100 to-white rounded-4xl shadow-sm border border-gray-100"></div>
-                        <img 
-                            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1500&auto=format&fit=crop" 
-                            alt="Abstract minimal" 
+                        <img
+                            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1500&auto=format&fit=crop"
+                            alt="Abstract minimal"
                             className="absolute inset-0 w-full h-full object-cover rounded-4xl opacity-40 mix-blend-multiply"
                         />
-                        
+
                         {/* Floating Cards simulating CRUD operations */}
                         <div className="relative z-10 transform rotate-6 translate-x-8 -translate-y-8 bg-white p-3 pr-8 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3">
                             <div className="w-8 h-8 bg-gray-50 rounded-md flex items-center justify-center shadow-inner">📝</div>
