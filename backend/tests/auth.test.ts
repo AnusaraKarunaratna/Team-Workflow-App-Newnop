@@ -7,7 +7,7 @@ describe("Auth API Endpoints", () => {
     const testUser = {
         name: "Test User",
         email: "test@example.com",
-        password: "password123"
+        password: "Creator_2026"
     };
 
     describe("POST /api/auth/register", () => {

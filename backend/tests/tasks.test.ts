@@ -9,7 +9,7 @@ describe("Task API Endpoints", () => {
         const res = await request(app).post("/api/auth/register").send({
             name: "Task Creator",
             email: "creator@example.com",
-            password: "password123"
+            password: "Creator_2026"
         });
         token = res.body.token;
         userId = res.body.user._id;
