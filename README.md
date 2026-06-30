@@ -9,7 +9,7 @@ This application enables teams and users to create, assign, manage, track, and c
 # Live Demo
 
 Frontend:
-`https://team-workflow-app-newnop-3hvjopwyx-anusaras-projects-fe99f6cc.vercel.app/`
+`https://team-workflow-app-newnop.vercel.app/`
 
 Backend API:
 `https://team-workflow-app-newnop-production.up.railway.app/api/auth/register`
